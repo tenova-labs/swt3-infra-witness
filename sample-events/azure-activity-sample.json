@@ -1,0 +1,22 @@
+{"records": [
+  {
+    "operationName": {"value": "Microsoft.Compute/virtualMachines/write", "localizedValue": "Create or Update Virtual Machine"},
+    "caller": "deploy@example.onmicrosoft.com",
+    "resourceId": "/subscriptions/sub-123/resourceGroups/rg-prod/providers/Microsoft.Compute/virtualMachines/vm-web-01",
+    "eventTimestamp": "2026-10-31T14:22:07Z",
+    "status": {"value": "Succeeded"},
+    "resourceGroupName": "rg-prod",
+    "subscriptionId": "sub-123",
+    "correlationId": "a1b2c3d4-e5f6-7890-abcd-000000000001"
+  },
+  {
+    "operationName": {"value": "Microsoft.Network/networkSecurityGroups/securityRules/write", "localizedValue": "Create or Update Security Rule"},
+    "caller": "deploy@example.onmicrosoft.com",
+    "resourceId": "/subscriptions/sub-123/resourceGroups/rg-prod/providers/Microsoft.Network/networkSecurityGroups/nsg-web/securityRules/allow-https",
+    "eventTimestamp": "2026-10-31T14:23:15Z",
+    "status": {"value": "Succeeded"},
+    "resourceGroupName": "rg-prod",
+    "subscriptionId": "sub-123",
+    "correlationId": "a1b2c3d4-e5f6-7890-abcd-000000000002"
+  }
+]}
