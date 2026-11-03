@@ -1,0 +1,32 @@
+{"events": [
+  {
+    "class_uid": 6003,
+    "class_name": "api_activity",
+    "api": {"operation": "RunInstances"},
+    "actor": {"user": {"uid": "arn:aws:iam::123456789012:role/deploy-agent", "name": "deploy-agent"}},
+    "cloud": {
+      "region": "us-east-1",
+      "resource": {"uid": "arn:aws:ec2:us-east-1:123456789012:instance/i-0abc123def456"}
+    },
+    "time": "2026-10-31T14:22:07Z",
+    "status": "Success",
+    "status_id": 1,
+    "activity_id": 1,
+    "metadata": {"uid": "ocsf-sample-001"}
+  },
+  {
+    "class_uid": 6003,
+    "class_name": "api_activity",
+    "api": {"operation": "CreateDBInstance"},
+    "actor": {"user": {"uid": "arn:aws:iam::123456789012:role/data-team"}},
+    "cloud": {
+      "region": "eu-west-1",
+      "resource": {"uid": "arn:aws:rds:eu-west-1:123456789012:db:prod-analytics"}
+    },
+    "time": "2026-10-31T14:23:15Z",
+    "status": "Success",
+    "status_id": 1,
+    "activity_id": 1,
+    "metadata": {"uid": "ocsf-sample-002"}
+  }
+]}

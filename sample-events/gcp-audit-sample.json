@@ -1,0 +1,47 @@
+{"entries": [
+  {
+    "protoPayload": {
+      "methodName": "compute.instances.insert",
+      "authenticationInfo": {"principalEmail": "deploy@my-project.iam.gserviceaccount.com"},
+      "status": {},
+      "serviceName": "compute.googleapis.com"
+    },
+    "resource": {
+      "type": "gce_instance",
+      "labels": {"project_id": "my-project", "instance_id": "1234567890123456", "zone": "us-central1-a"}
+    },
+    "timestamp": "2026-10-31T14:22:07Z",
+    "insertId": "gcp-sample-001",
+    "severity": "NOTICE"
+  },
+  {
+    "protoPayload": {
+      "methodName": "storage.buckets.create",
+      "authenticationInfo": {"principalEmail": "admin@my-project.iam.gserviceaccount.com"},
+      "status": {},
+      "serviceName": "storage.googleapis.com"
+    },
+    "resource": {
+      "type": "gcs_bucket",
+      "labels": {"project_id": "my-project", "bucket_name": "my-evidence-bucket", "location": "us-east1"}
+    },
+    "timestamp": "2026-10-31T14:23:15Z",
+    "insertId": "gcp-sample-002",
+    "severity": "NOTICE"
+  },
+  {
+    "protoPayload": {
+      "methodName": "compute.firewalls.delete",
+      "authenticationInfo": {"principalEmail": "deploy@my-project.iam.gserviceaccount.com"},
+      "status": {"code": 403, "message": "PERMISSION_DENIED"},
+      "serviceName": "compute.googleapis.com"
+    },
+    "resource": {
+      "type": "gce_firewall",
+      "labels": {"project_id": "my-project"}
+    },
+    "timestamp": "2026-10-31T14:24:30Z",
+    "insertId": "gcp-sample-003",
+    "severity": "ERROR"
+  }
+]}
