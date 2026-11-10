@@ -6,6 +6,14 @@ AI agents are deploying cloud infrastructure autonomously. Pulumi Neo, StackGen 
 
 One tree. Both evidence streams. No competitor has this.
 
+---
+
+## v8.1.0 -- Hierarchical Milestone Merkle Trees
+
+v8.0.0 put infrastructure evidence alongside AI inference evidence in a flat daily Merkle root. v8.1.0 gives that tree hierarchical structure. Infrastructure changes don't happen in isolation -- they happen in phases. A cloud migration has stages: provision networking, deploy compute, configure security, validate connectivity. An AI-driven deployment pipeline has ordered steps: scale cluster, deploy model, run canary, promote to production. Flat Merkle roots cannot express "the security group must be configured before the instance launches." Hierarchical milestone trees can.
+
+**Why this matters for infrastructure witnessing:** When an AI agent orchestrates a multi-step deployment via Terraform or Pulumi, CloudTrail captures each API call independently. This binary already extracts canonical fields and witnesses each event. With hierarchical milestone trees, those infrastructure anchors now land inside ordered phases. The Phase 1 milestone "VPC created" and the Phase 1 milestone "security group configured" must both pass before the Phase 2 gate opens for "instance launched." A single three-tier Merkle proof says "networking was provisioned and secured before compute was deployed" -- not because a pipeline tool says so, but because the cryptographic structure enforces it. The proof spans from a single CloudTrail event leaf through its milestone, through its phase, to the structure root.
+
 ## How it works
 
 ```

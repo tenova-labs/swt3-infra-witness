@@ -18,7 +18,7 @@ import (
 )
 
 // Version is the binary version, embedded in every anchor's observations.
-const Version = "0.1.0"
+const Version = "8.1.0"
 
 // ── Inlined from swt3-ai-go ─────────────────────────────────────────
 // Fingerprint formula is LOCKED, cross-language parity verified via
