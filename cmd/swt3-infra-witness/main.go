@@ -23,6 +23,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/tenova-labs/swt3-infra-witness/internal/client"
 	"github.com/tenova-labs/swt3-infra-witness/internal/modes"
@@ -38,23 +39,28 @@ USAGE:
   swt3-infra-witness --mode cli --format cloudtrail --input events.json
   swt3-infra-witness --mode cli --format cloudtrail --input events.json --dry-run
   swt3-infra-witness --mode server --port 8080
+  swt3-infra-witness --mode tail --watch-dir /shared/swt3
   cat events.json | swt3-infra-witness --mode cli
 
 MODES:
   cli       Read file or stdin, process, send, exit (default)
   server    HTTP webhook receiver (POST / and GET /healthz)
+  tail      Watch directory for JSONL telemetry files (sidecar mode)
   pull      S3 bucket polling (Phase 2)
   lambda    AWS Lambda handler (Phase 2)
 
 FLAGS:
-  --mode       Execution mode: cli, server, pull, lambda (default: cli)
-  --format     Input format: cloudtrail, azure, gcp, ocsf, auto (default: auto)
-  --input      Input file path, - for stdin (default: -)
-  --port          HTTP port for server mode (default: 8080)
-  --metrics-port  Separate port for /metrics endpoint (default: same as --port)
-  --dry-run       Parse and hash events without sending to SWT3
-  --no-cursor     Disable cursor file for CLI dedup
-  --version       Print version and exit
+  --mode           Execution mode: cli, server, tail (default: cli)
+  --format         Input format: cloudtrail, azure, gcp, ocsf, swt3, otel, auto (default: auto)
+  --input          Input file path, - for stdin (default: -)
+  --port           HTTP port for server mode (default: 8080)
+  --metrics-port   Separate port for /metrics endpoint (default: same as --port)
+  --watch-dir      Directory to watch for JSONL files in tail mode (default: /var/log/swt3)
+  --poll-interval  Seconds between directory scans in tail mode (default: 2)
+  --cursor-dir     Directory for tail mode cursor files (default: .swt3-tail-cursors)
+  --dry-run        Parse and hash events without sending to SWT3
+  --no-cursor      Disable cursor file for CLI/tail dedup
+  --version        Print version and exit
 
 ENVIRONMENT:
   SWT3_API_KEY         (required) Your SWT3 API key (axm_*)
@@ -64,8 +70,12 @@ ENVIRONMENT:
   SWT3_SIGNING_KEY     HMAC-SHA256 signing key
 
 QUICKSTART:
+  # Cloud audit logs
   export SWT3_API_KEY=axm_live_xxx
   swt3-infra-witness --mode cli --format cloudtrail --input cloudtrail-events.json
+
+  # AI telemetry sidecar (Kubernetes shared volume)
+  swt3-infra-witness --mode tail --watch-dir /shared/swt3 --metrics-port 9091
 
 DOCS:  https://sovereign.tenova.io/docs
 `
@@ -76,6 +86,9 @@ func main() {
 	input := flag.String("input", "-", "")
 	port := flag.Int("port", 8080, "")
 	metricsPort := flag.Int("metrics-port", 0, "")
+	watchDir := flag.String("watch-dir", "/var/log/swt3", "")
+	pollInterval := flag.Int("poll-interval", 2, "")
+	cursorDir := flag.String("cursor-dir", ".swt3-tail-cursors", "")
 	noCursor := flag.Bool("no-cursor", false, "")
 	dryRun := flag.Bool("dry-run", false, "")
 	version := flag.Bool("version", false, "")
@@ -124,6 +137,9 @@ func main() {
 		err = modes.RunCLI(cfg, *format, *input, *noCursor, *dryRun)
 	case "server":
 		err = modes.RunServer(cfg, *format, *port, *metricsPort)
+	case "tail":
+		err = modes.RunTail(cfg, *format, *watchDir, *cursorDir,
+			time.Duration(*pollInterval)*time.Second, *metricsPort, *noCursor, *dryRun)
 	case "pull":
 		fmt.Fprintln(os.Stderr, "Pull mode requires the aws build tag (Phase 2).")
 		fmt.Fprintln(os.Stderr, "Use --mode cli or --mode server for Phase 1.")
@@ -133,7 +149,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Use --mode cli or --mode server for Phase 1.")
 		os.Exit(1)
 	default:
-		fmt.Fprintf(os.Stderr, "unknown mode: %s (supported: cli, server)\n", *mode)
+		fmt.Fprintf(os.Stderr, "unknown mode: %s (supported: cli, server, tail)\n", *mode)
 		os.Exit(1)
 	}
 

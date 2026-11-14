@@ -230,12 +230,69 @@ kubectl get events -n swt3-system --sort-by='.lastTimestamp'
 
 ---
 
+## Failure: Tail Mode Not Processing Events
+
+**Symptom**: Sidecar running but `swt3_tail_files_watched == 0` or `swt3_events_processed_total` not incrementing
+
+**Causes**:
+1. Shared volume not mounted (emptyDir missing from pod spec)
+2. App writing to wrong directory (not `/shared/swt3/`)
+3. App writing non-JSONL files (tail mode only reads `*.json` and `*.jsonl`)
+4. Volume mounted read-only on the app side (cannot write)
+5. Cursor ahead of file (file was truncated but cursor not reset)
+
+**Resolution**:
+```bash
+# Check the sidecar healthz
+kubectl exec deploy/my-app -c swt3-witness-sidecar -- wget -qO- http://localhost:9091/healthz
+
+# Verify the watch directory has files
+kubectl exec deploy/my-app -c swt3-witness-sidecar -- ls -la /shared/swt3/
+
+# Check if the app is writing (run from the app container)
+kubectl exec deploy/my-app -c my-app -- ls -la /shared/swt3/
+
+# Check metrics for file count
+kubectl exec deploy/my-app -c swt3-witness-sidecar -- wget -qO- http://localhost:9091/metrics | grep swt3_tail_files_watched
+
+# If cursor is stale, delete cursor file (will re-process existing data -- server deduplicates)
+kubectl exec deploy/my-app -c swt3-witness-sidecar -- rm -f /shared/swt3/.swt3-tail-cursors/cursors.json
+```
+
+**Common fix**: The app container must mount the volume as read-write. The sidecar mounts it as read-only. Check both volume mounts in the pod spec.
+
+---
+
+## Failure: Tail Mode High Error Rate
+
+**Symptom**: `swt3_events_errors_total` increasing, "parse error" messages in logs
+
+**Causes**:
+1. App writing invalid JSON (missing commas, unquoted strings)
+2. App writing non-telemetry JSON (no `model` field for SWT3 format, no `gen_ai.*` attributes for OTel format)
+3. Binary data mixed with JSONL in the same file
+4. Format flag mismatch (`--format otel` but app writes SWT3 simple JSON)
+
+**Resolution**:
+```bash
+# Check sidecar logs for parse errors
+kubectl logs deploy/my-app -c swt3-witness-sidecar | grep "parse error"
+
+# Validate a telemetry line manually
+echo '{"model":"gpt-4","tokens_in":100,"tokens_out":50,"latency_ms":500,"status":"ok"}' | python3 -m json.tool
+
+# Use --format auto (default) to accept both SWT3 and OTel formats
+# Only use --format swt3 or --format otel if you know the app only writes one format
+```
+
+---
+
 ## Health Check Reference
 
 | Endpoint | Port | Auth | What It Checks |
 |----------|------|------|----------------|
-| GET /healthz | 8080 (main) | None | Binary alive, uptime, event count, error count |
-| GET /metrics | 8080 or --metrics-port | None | Prometheus counters, gauges, build info |
+| GET /healthz | 8080 (server) or --metrics-port (tail) | None | Binary alive, uptime, event count, error count, files watched (tail) |
+| GET /metrics | 8080 or --metrics-port | None | Prometheus counters, gauges, build info, tail-specific metrics |
 | swt3 doctor | CLI | Config file | YAML valid, env vars set, profile valid, mock endpoint detection |
 | swt3 verify-chain | CLI | None | WAL + handoff integrity, timestamps, Merkle roots |
 | swt3 status | CLI | API key | Portal connectivity, recent anchor count |

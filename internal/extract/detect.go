@@ -17,8 +17,12 @@ func AutoDetect(data []byte) ([]CanonicalEvent, error) {
 		return ParseGCPAudit(data)
 	case "ocsf":
 		return ParseOCSF(data)
+	case "swt3":
+		return ParseSWT3Telemetry(data)
+	case "otel":
+		return ParseOTelSpans(data)
 	default:
-		return nil, fmt.Errorf("could not auto-detect format. Supported: cloudtrail, azure, gcp, ocsf. Use --format to specify explicitly")
+		return nil, fmt.Errorf("could not auto-detect format. Supported: cloudtrail, azure, gcp, ocsf, swt3, otel. Use --format to specify explicitly")
 	}
 }
 
@@ -27,6 +31,21 @@ func DetectFormat(data []byte) string {
 	// Try as object first
 	var obj map[string]json.RawMessage
 	if err := json.Unmarshal(data, &obj); err == nil {
+		// AI telemetry formats (tail mode)
+		if _, ok := obj["resourceSpans"]; ok {
+			return "otel" // OTLP JSON envelope
+		}
+		if _, ok := obj["traceId"]; ok {
+			if _, ok2 := obj["spanId"]; ok2 {
+				return "otel" // Single OTel span
+			}
+		}
+		if _, ok := obj["model"]; ok {
+			if _, ok2 := obj["tokens_in"]; ok2 {
+				return "swt3" // SWT3 simple AI telemetry
+			}
+		}
+
 		// Check for envelope keys
 		if _, ok := obj["Records"]; ok {
 			return "cloudtrail" // CloudTrail S3 delivery (uppercase R)

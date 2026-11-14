@@ -1,0 +1,87 @@
+# SWT3 Infrastructure Witness -- Prometheus Alerting Rules
+#
+# Apply standalone:
+#   kubectl apply -f prometheus-alerts.yml
+#
+# Or enable via Helm chart:
+#   helm install swt3 tenova/swt3-witness --set prometheus.rules.enabled=true
+#
+# These rules use metrics exposed by swt3-infra-witness on /metrics.
+# RT-7: Alert labels reference metric names only, never fingerprints or tenant IDs.
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: swt3-infra-witness
+  labels:
+    app.kubernetes.io/name: swt3-infra-witness
+    app.kubernetes.io/part-of: swt3
+spec:
+  groups:
+    - name: swt3-infra-witness
+      rules:
+        # No events witnessed in over 1 hour.
+        # Expected: at least one event per hour in active environments.
+        - alert: SWT3EventsStale
+          expr: time() - swt3_last_witnessed_timestamp > 3600
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "SWT3 witness has not processed events in over 1 hour"
+            runbook: "https://sovereign.tenova.io/guides/sre-runbook-infra-witness.html"
+
+        # Error rate exceeds 10% of processed events.
+        - alert: SWT3HighErrorRate
+          expr: >
+            rate(swt3_events_errors_total[5m])
+            / (rate(swt3_events_processed_total[5m]) + 0.001)
+            > 0.1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "SWT3 witness error rate exceeds 10%"
+            runbook: "https://sovereign.tenova.io/guides/sre-runbook-infra-witness.html"
+
+        # Batch latency exceeds 5 seconds.
+        - alert: SWT3BatchLatencyHigh
+          expr: swt3_last_batch_latency_ms > 5000
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "SWT3 witness batch latency exceeds 5 seconds"
+            runbook: "https://sovereign.tenova.io/guides/sre-runbook-infra-witness.html"
+
+        # Witness recently restarted (uptime < 60 seconds).
+        - alert: SWT3RecentRestart
+          expr: swt3_uptime_seconds < 60 and swt3_uptime_seconds > 0
+          for: 1m
+          labels:
+            severity: info
+          annotations:
+            summary: "SWT3 witness recently restarted"
+
+        # Over 50% of events are duplicates for 15+ minutes.
+        # Indicates misconfigured event source or cursor issues.
+        - alert: SWT3DeduplicationHigh
+          expr: >
+            rate(swt3_dedup_skipped_total[5m])
+            / (rate(swt3_events_processed_total[5m]) + rate(swt3_dedup_skipped_total[5m]) + 0.001)
+            > 0.5
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Over 50% of events are duplicates"
+
+        # Tail mode: watching zero files for 10+ minutes.
+        - alert: SWT3TailNoFiles
+          expr: swt3_tail_files_watched == 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "SWT3 tail mode is watching zero files in watch directory"
+            runbook: "Check that the shared volume is mounted and the app is writing .jsonl files"
