@@ -1,1 +1,4 @@
 swt3-infra-witness
+swt3-infra-witness-arm64
+.env
+!.env.example

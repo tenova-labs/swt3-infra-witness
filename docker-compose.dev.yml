@@ -1,0 +1,60 @@
+# SWT3 Infra-Witness -- Developer Environment
+#
+# Demonstrates the full infrastructure witness pipeline locally:
+#   1. mock-receiver: accepts witness payloads, returns SWT3-MOCK- receipts
+#   2. infra-witness: parses cloud audit events, hashes them, witnesses via mock
+#   3. event-generator: POSTs sample CloudTrail/Azure/GCP/OCSF events
+#
+# Usage:
+#   docker compose -f docker-compose.dev.yml up
+#   docker compose -f docker-compose.dev.yml up -d   # background
+#   curl http://localhost:8080/healthz                # witness health
+#   curl http://localhost:9999/healthz                # mock health
+#
+# To stop:
+#   docker compose -f docker-compose.dev.yml down
+#
+# FOR TESTING ONLY. The mock-receiver returns SWT3-MOCK- prefixed anchors
+# that are rejected by the production portal. Replace SWT3_ENDPOINT with
+# https://sovereign.tenova.io/api/v1/witness/ocsf for real witnessing.
+
+services:
+  mock-receiver:
+    build:
+      context: .
+      dockerfile: Dockerfile.mock
+    ports:
+      - "127.0.0.1:9999:9999"  # localhost only -- never expose mock to network
+    restart: unless-stopped
+
+  infra-witness:
+    build: .
+    environment:
+      # WARNING: This is a placeholder key for local testing only.
+      # Replace with your real API key (axm_open_* or axm_live_*) for production.
+      # The binary warns on startup if it detects non-production keys.
+      SWT3_API_KEY: "swt3_dev_REPLACE_ME"
+      SWT3_ENDPOINT: "http://mock-receiver:9999/api/v1/witness/ocsf"
+      SWT3_CLEARING_LEVEL: "1"
+      SWT3_AGENT_ID: "dev-infra-witness"
+    command: ["--mode", "server", "--port", "8080", "--format", "auto"]
+    ports:
+      - "127.0.0.1:8080:8080"  # localhost only
+    depends_on:
+      - mock-receiver
+    restart: unless-stopped
+
+  event-generator:
+    image: alpine:3.20
+    entrypoint: ["/bin/sh"]
+    command: ["-c", "apk add --no-cache wget > /dev/null 2>&1 && sh /events/generate-events.sh"]
+    environment:
+      WITNESS_URL: "http://infra-witness:8080"
+      EVENTS_DIR: "/events"
+      DELAY: "3"
+    volumes:
+      - ./sample-events:/events:ro
+      - ./scripts/generate-events.sh:/events/generate-events.sh:ro
+    depends_on:
+      - infra-witness
+    restart: unless-stopped
