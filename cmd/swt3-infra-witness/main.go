@@ -113,7 +113,7 @@ func main() {
 		SigningKey:    os.Getenv("SWT3_SIGNING_KEY"),
 	}
 
-	if cfg.APIKey == "" {
+	if cfg.APIKey == "" && !*dryRun {
 		fmt.Fprintln(os.Stderr, "error: SWT3_API_KEY environment variable is required")
 		fmt.Fprintln(os.Stderr, "  Get your API key at https://sovereign.tenova.io/settings")
 		os.Exit(1)
