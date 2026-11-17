@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SWT3 AI Witness — Coverage Report</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#070504;color:#E0D9D1;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:2.5rem;line-height:1.6}
+.c{max-width:800px;margin:0 auto}
+h1{color:#E8A87C;font-size:1.5rem;margin-bottom:.25rem}
+h2{color:#E8A87C;font-size:1.1rem;margin:1.5rem 0 .75rem}
+.meta{color:#6B7280;font-size:.8rem;margin-bottom:1.5rem}
+.score{font-size:2.5rem;font-weight:800;margin:1rem 0}
+.score .pass{color:#4ADE80}
+.score .total{color:#6B7280}
+table{width:100%;border-collapse:collapse;margin:.75rem 0;font-size:.9rem}
+th{text-align:left;padding:.5rem .75rem;color:#E8A87C;border-bottom:1px solid #222;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em}
+td{padding:.5rem .75rem;border-bottom:1px solid #151312}
+pre{background:#111;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.8rem;color:#9CA3AF;margin:.75rem 0;border:1px solid #222}
+.countdown{font-size:1rem;font-weight:600;color:#FBBF24;margin:1.5rem 0}
+.cta{display:inline-block;margin-top:1.25rem;padding:.75rem 2rem;background:#E8A87C;color:#070504;font-weight:700;text-decoration:none;border-radius:6px;font-size:.9rem;letter-spacing:.03em}
+.cta:hover{opacity:.9}
+.cta-secondary{display:inline-block;margin-top:1.25rem;margin-right:.75rem;padding:.75rem 2rem;background:transparent;color:#E8A87C;border:1px solid #E8A87C;font-weight:600;text-decoration:none;border-radius:6px;font-size:.9rem;letter-spacing:.03em}
+.cta-secondary:hover{background:rgba(232,168,124,.1)}
+.footer{color:#6B7280;font-size:.75rem;margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid #222}
+.warn{color:#FBBF24}
+.sep{border:none;border-top:1px solid #222;margin:1.5rem 0}
+</style>
+</head>
+<body>
+<div class="c">
+<h1>SWT3 AI Witness — Coverage Report</h1>
+<p class="meta">Generated 2026-11-14 21:21:48 UTC | SWT3 Protocol v1.6.0 | Demo Environment</p>
+
+<div class="score"><span class="pass">15</span><span class="total"> / 15 obligations mapped</span></div>
+<p style="color:#9CA3AF;font-size:.95rem;margin-top:-.5rem">6 demonstrated locally · 9 need production data</p>
+
+<h2>Demonstrated Locally</h2>
+<table>
+<tr><th>Procedure</th><th>EU AI Act</th><th>Obligation</th><th>Status</th></tr>
+<tr><td style="font-family:monospace">AI-INF.1</td><td>Art. 12(1)</td><td>Automatic Logging of Use Periods</td><td style="color:#4ADE80;font-weight:700">[DEMONSTRATED]</td></tr><tr><td style="font-family:monospace">AI-MDL.1</td><td>Art. 9(4a)</td><td>Model Risk Identification</td><td style="color:#4ADE80;font-weight:700">[DEMONSTRATED]</td></tr><tr><td style="font-family:monospace">AI-GRD.1</td><td>Art. 9(2a)</td><td>Risk Mitigation Measures</td><td style="color:#4ADE80;font-weight:700">[DEMONSTRATED]</td></tr><tr><td style="font-family:monospace">AI-RAG.1</td><td>Art. 12(2)(a)</td><td>Reference Database Logging</td><td style="color:#4ADE80;font-weight:700">[DEMONSTRATED]</td></tr><tr><td style="font-family:monospace">AI-RAG.2</td><td>Art. 10(2)</td><td>Data Quality & Relevance</td><td style="color:#4ADE80;font-weight:700">[DEMONSTRATED]</td></tr><tr><td style="font-family:monospace">AI-LIC.1</td><td>Art. 53(1d)</td><td>Training Data Licensing (GPAI)</td><td style="color:#4ADE80;font-weight:700">[DEMONSTRATED]</td></tr><tr><td style="font-family:monospace">NHI-EXPIRE.1</td><td>Art. 9(2a)</td><td>Credential Temporal Authority</td><td style="color:#4ADE80;font-weight:700">[DEMONSTRATED]</td></tr>
+</table>
+
+<h2>Mapped — Needs Production Data (9)</h2>
+<table>
+<tr><th>Procedure</th><th>EU AI Act</th><th>Obligation</th><th>Status</th></tr>
+<tr><td style="font-family:monospace">AI-INF.2</td><td>Art. 15(3)</td><td>Performance Consistency</td><td style="color:#9CA3AF;font-weight:600">[NEEDS PRODUCTION]</td></tr><tr><td style="font-family:monospace">AI-INF.3</td><td>Art. 12(1)</td><td>Volume & Usage Logging</td><td style="color:#9CA3AF;font-weight:600">[NEEDS PRODUCTION]</td></tr><tr><td style="font-family:monospace">AI-MDL.2</td><td>Art. 12(2b)</td><td>Version & Lineage Tracking</td><td style="color:#9CA3AF;font-weight:600">[NEEDS PRODUCTION]</td></tr><tr><td style="font-family:monospace">AI-MDL.3</td><td>Art. 72(1)</td><td>Post-Market Drift Monitoring</td><td style="color:#9CA3AF;font-weight:600">[NEEDS PRODUCTION]</td></tr><tr><td style="font-family:monospace">AI-MDL.4</td><td>Art. 15(4)</td><td>Feedback Loop Isolation</td><td style="color:#9CA3AF;font-weight:600">[NEEDS PRODUCTION]</td></tr><tr><td style="font-family:monospace">AI-GRD.2</td><td>Art. 9(4b)</td><td>Content Safety Filtering</td><td style="color:#9CA3AF;font-weight:600">[NEEDS PRODUCTION]</td></tr><tr><td style="font-family:monospace">AI-GRD.3</td><td>Art. 10(2f)</td><td>PII & Data Protection</td><td style="color:#9CA3AF;font-weight:600">[NEEDS PRODUCTION]</td></tr><tr><td style="font-family:monospace">AI-EXPL.1</td><td>Art. 13(1)</td><td>Transparency & Explainability</td><td style="color:#9CA3AF;font-weight:600">[NEEDS PRODUCTION]</td></tr><tr><td style="font-family:monospace">AI-EXPL.2</td><td>Art. 13(3b)</td><td>Confidence Calibration</td><td style="color:#9CA3AF;font-weight:600">[NEEDS PRODUCTION]</td></tr>
+</table>
+
+<hr class="sep">
+
+<p class="countdown">EU AI Act high-risk enforcement in 383 days (December 2, 2027)</p>
+
+<h2>Anchor Evidence (Demo)</h2>
+<pre>SWT3-E-LOCAL-AI-AI-INF.1-PASS-1794691308-67665299c97d
+SWT3-E-LOCAL-AI-AI-MDL.1-PASS-1794691308-9c25d585c2ee
+SWT3-E-LOCAL-AI-AI-GRD.1-PASS-1794691308-6016b4369ef0
+SWT3-E-LOCAL-AI-AI-RAG.1-PASS-1794691308-91dce2dddb05
+SWT3-E-LOCAL-AI-AI-RAG.2-PASS-1794691308-49fa492b14d0
+SWT3-E-LOCAL-AI-AI-LIC.1-PASS-1794691308-620e2001fee4
+SWT3-E-LOCAL-AI-NHI-EXPIRE.1-PASS-1794691308-8c292a46f61e</pre>
+
+<p>Full conformity requires all 48 AI procedures across inference, model governance, guardrails, RAG, skills, licensing, and explainability domains.</p>
+<a class="cta-secondary" href="https://sovereign.tenova.io/audit/axm_audit_demo_eu_ai_act_public">See Live Auditor View →</a>
+<a class="cta" href="https://sovereign.tenova.io/signup?ref=sdk_demo">Close the Gap — Free Account</a>
+<p style="margin-top:.75rem;font-size:.8rem;color:#9CA3AF">Preview a real tenant's EU AI Act posture (no account required) — then create your own.</p>
+
+<div class="footer">
+<p>SWT3 Protocol — Patent Pending — Apache 2.0</p>
+<p>TeNova: Defining the AI Accountability Standard.</p>
+<p style="margin-top:.5rem">This report was generated locally by the SWT3 AI Witness SDK demo. No data was transmitted.</p>
+</div>
+</div>
+</body>
+</html>

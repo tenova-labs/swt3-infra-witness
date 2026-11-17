@@ -8,6 +8,20 @@ One tree. Both evidence streams. No competitor has this.
 
 ---
 
+## v8.2.0 -- Terraform Enterprise Deployment
+
+v8.2.0 is the enterprise deployment release. The infra witness binary now deploys natively into AWS, Azure, and GCP via Terraform modules -- no manual binary installation, no custom Lambda packaging, no cloud-specific glue code.
+
+**5 Terraform modules.** AWS Lambda + CloudTrail (S3 -> SQS -> Lambda), AWS ECS sidecar (container definition for existing tasks), AWS EKS DaemonSet (Helm-based hardware attestation), Azure Function (Event Grid trigger), GCP Cloud Function (Log Router -> Pub/Sub trigger). Each module enforces cloud-native secret stores -- raw API keys cannot be passed. Every module outputs a `deployment_fingerprint` for portal verification.
+
+**Passive tail sidecar.** For the 50-microservice problem: a sidecar reads structured JSON logs via shared volume mount and witnesses them without any SDK changes. `kubectl apply` adds governance to existing pods.
+
+**5 new CLI commands.** `swt3 verify-chain` (local chain integrity with tamper detection), `swt3 mock-server` (local test endpoint), `swt3 profile list|show|compare` (governance profiles), `swt3 upgrade` (version check). Plus Docker Compose dev environment, Prometheus /metrics endpoint, Grafana dashboard, and SRE runbook.
+
+**Why this matters:** Infrastructure teams no longer need to understand the SWT3 protocol to deploy it. A platform engineer adds a Terraform module to their existing IaC, runs `terraform apply`, and infrastructure evidence starts flowing. The binary, the cloud wiring, the secret management, and the alarm configuration are all handled by the module. The infra witness went from "download a binary and write glue code" to "`terraform apply` and verify."
+
+---
+
 ## v8.1.0 -- Hierarchical Milestone Merkle Trees
 
 v8.0.0 put infrastructure evidence alongside AI inference evidence in a flat daily Merkle root. v8.1.0 gives that tree hierarchical structure. Infrastructure changes don't happen in isolation -- they happen in phases. A cloud migration has stages: provision networking, deploy compute, configure security, validate connectivity. An AI-driven deployment pipeline has ordered steps: scale cluster, deploy model, run canary, promote to production. Flat Merkle roots cannot express "the security group must be configured before the instance launches." Hierarchical milestone trees can.
@@ -173,14 +187,14 @@ Daily Merkle Root
 Infrastructure anchors follow the SWT3 anchor specification:
 
 ```
-SWT3-E-VULTR-AUD-INF-OCSF.1-PASS-1730380800-63bc4d83d6b9
+SWT3-E-AWS-AUD-INF-OCSF.1-PASS-1730380800-63bc4d83d6b9
 ```
 
 | Segment | Value | Meaning |
 |---------|-------|---------|
 | Protocol | `SWT3` | SWT3 protocol |
 | Tier | `E` | Enclave deployment |
-| Provider | `VULTR` | Infrastructure provider (where SWT3 runs) |
+| Provider | `AWS` | Infrastructure provider (where SWT3 runs) |
 | UCT | `AUD` | Audit & Accountability domain |
 | Procedure | `INF-OCSF.1` | Infrastructure OCSF Evidence |
 | Verdict | `PASS` | Evidence recorded (always PASS) |

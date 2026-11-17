@@ -46,7 +46,7 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"ok": true, "mock": true, "version": "8.1.0",
+			"ok": true, "mock": true, "version": "8.2.0",
 		})
 	})
 
